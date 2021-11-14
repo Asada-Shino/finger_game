@@ -12,32 +12,32 @@ stage add(const stage* s, int type) {
             switch (type) {
                 case LEFT_ADD_LEFT:
                     return s->a1 == 0 || s->b1 == 0 ? (stage){0,0,0,0,0}
-                            : (stage){(s->a1 + s->b1)%10, s->a2, s->b1, s->b2, B_TURN};
+                            : (stage){(s->a1 + s->b1)%BASE, s->a2, s->b1, s->b2, B_TURN};
                 case LEFT_ADD_RIGHT:
                     return s->a1 == 0 || s->b2 == 0? (stage){0,0,0,0,0}
-                            : (stage){(s->a1 + s->b2)%10, s->a2, s->b1, s->b2, B_TURN};
+                            : (stage){(s->a1 + s->b2)%BASE, s->a2, s->b1, s->b2, B_TURN};
                 case RIGHT_ADD_LEFT:
                     return s->a2 == 0 || s->b1 == 0? (stage){0,0,0,0,0}
-                            : (stage){s->a1, (s->a2 + s->b1)%10, s->b1, s->b2, B_TURN};
+                            : (stage){s->a1, (s->a2 + s->b1)%BASE, s->b1, s->b2, B_TURN};
                 case RIGHT_ADD_RIGHT:
                     return s->a2 == 0 || s->b2 == 0? (stage){0,0,0,0,0}
-                            : (stage){s->a1, (s->a2 + s->b2)%10, s->b1, s->b2, B_TURN};
+                            : (stage){s->a1, (s->a2 + s->b2)%BASE, s->b1, s->b2, B_TURN};
             }
             break;
         case B_TURN:
             switch (type) {
                 case LEFT_ADD_LEFT:
                     return s->b1 == 0 || s->a1 == 0? (stage){0,0,0,0,0}
-                            : (stage){s->a1, s->a2, (s->b1 + s->a1)%10, s->b2, A_TURN};
+                            : (stage){s->a1, s->a2, (s->b1 + s->a1)%BASE, s->b2, A_TURN};
                 case LEFT_ADD_RIGHT:
                     return s->b1 == 0 || s->a2 == 0? (stage){0,0,0,0,0}
-                            : (stage){s->a1, s->a2, (s->b1 + s->a2)%10, s->b2, A_TURN};
+                            : (stage){s->a1, s->a2, (s->b1 + s->a2)%BASE, s->b2, A_TURN};
                 case RIGHT_ADD_LEFT:
                     return s->b2 == 0 || s->a1 == 0?(stage){0,0,0,0,0}
-                            : (stage){s->a1, s->a2, s->b1, (s->b2 + s->a1)%10, A_TURN};
+                            : (stage){s->a1, s->a2, s->b1, (s->b2 + s->a1)%BASE, A_TURN};
                 case RIGHT_ADD_RIGHT:
                     return s->b2 == 0 || s->a2 == 0? (stage){0,0,0,0,0}
-                            : (stage){s->a1, s->a2, s->b1, (s->b2 + s->a2)%10, A_TURN};
+                            : (stage){s->a1, s->a2, s->b1, (s->b2 + s->a2)%BASE, A_TURN};
             }
             break;
     }
@@ -82,18 +82,15 @@ int dfs(const stage* s) {
     if(s->round == A_TURN) {
         if(counts[A_WIN] > 0)
             return all_status[hash(s)] = A_WIN;
-        if(counts[TIE] > 0)
+        if(counts[TIE] > 0 || counts[PROCESSING] > 0)
             return all_status[hash(s)] = TIE;
-        if(counts[B_WIN] == counts[0])
-            return all_status[hash(s)] = B_WIN;
+        return all_status[hash(s)] = B_WIN;
     }
     else {
         if(counts[B_WIN] > 0)
             return all_status[hash(s)] = B_WIN;
-        if(counts[TIE] > 0)
+        if(counts[TIE] > 0 || counts[PROCESSING] > 0)
             return all_status[hash(s)] = TIE;
-        if(counts[A_WIN] == counts[0])
-            return all_status[hash(s)] = A_WIN;
+        return all_status[hash(s)] = A_WIN;
     }
-    return all_status[hash(s)] = TIE;
 }
