@@ -19,34 +19,8 @@ Why or when will the game come to a tie? Can the first player find a way to alwa
 To answer all my question, I create this repository to code and find. I cannot find some mathematical methods to creatively proof or draw some conclusions, so I decide to enumerate all possible situations by programming.
 ## Solution
 ### Mathematical Model
-I use a tuple of five elements to express one scene. (a1, a2, b1, b2, round), where a1 and a2 represents **A**'s left and right hands' numbers respectively, b1 and b2 represents **B**'s left and right hands' numbers respectively, and round represents whose turn now. a1, a2, b1, b2 ranges from 0 to 9, and round ranges from 0 to 1 (0 means it's **A**'s turn, 1 means it's **B**'s turn).For example, the initial scene can be written as (1,1,1,1,0);
-### Data Structure and Basic operations
-I define the scene like this:
-```c
-typedef int scene;
-// 0000-0000-0000-0000-0000, only 20 bits needed
-// each four bits represents a1, a2, b1, b2
-// the last four bit represents round 
-```
-some useful functions to fetch a1,a2,b1,b2,round, and some other definitions:
-```c
-#define HAND_NUM(c,i) (c&(0xf0000>>(i)))
-#define SET_HAND_NUM(c, i, res) (c&!(0xf0000>>(i)) | (res)<<(4-i)*4)
-#define ROUND(s) (s&1)
-#define LEFT_HAND 0
-#define RIGHT_HAND 1
-#define A_TURN 0
-#define B_TURN 1
-```
-To add one's number to the other one:
-```c
-scene add(scene s, int selected_hand, int to_hand) {
-    int selected_num = HAND_NUM(c, ((1-ROUND(s))<<1)+selected_hand);
-    int to_num = HAND_NUM(c, (ROUND(s)<<1)+to_hand);
-    if(selected_num == 0 || to_num == 0)
-        return -1;
-    int res = (selected_num+to_num)%10;
-    return SET_HAND
-}
-```
-### Strategy
+I use a tuple of five elements to express one stage. (a1, a2, b1, b2, round), where a1 and a2 represents **A**'s left and right hands' numbers respectively, b1 and b2 represents **B**'s left and right hands' numbers respectively, and round represents whose turn now. a1, a2, b1, b2 ranges from 0 to 9, and round ranges from 0 to 1 (0 means it's **A**'s turn, 1 means it's **B**'s turn).For example, the initial stage can be written as (1,1,1,1,0);
+### Algorithm
+I use dfs to search through all stages. When the algorithm is processing a stage, it sets all_status\[this_stage_id\] to PROCESSING. Then it goes through all stages starts with the given stage. For A's turn, if all results it finds contain 'A_WIN', then this stage is labeled as 'A_WIN'. If all results contain no 'A_WIN' but some 'TIE' or 'PROCESSING', then this stage is labeled as 'TIE', as it is the best result for A. If all results are 'B_WIN', then this stage is labeled 'B_WIN'. That's all what the algorithm does. For B's turn, it works similarly. So the algorithm repeats recursively, and finally returns the result we want.
+## Result
+For the starting stage (1,1,1,1,0), the game will come to a tie. It's interesting that for all possible starting stage (i, j, k, l, 0), where i,j,k,l ranges from 1~9, there are 222 stages that A has a must-win strategy. But B got no must-win strategies. All the left 6339 starting stages will come to a tie.
